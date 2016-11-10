@@ -15,6 +15,7 @@ public interface UrlRepository extends JpaRepository<UrlMapping, Integer> {
 
     Optional<UrlMapping> findByTargetUrlAndAccount(String targetUrl, Account account);
 
+    //TODO: cannot lock several tables for update, at least in H2
     //TODO: rename
     //TODO: better performance?
     @Lock(LockModeType.PESSIMISTIC_WRITE)
