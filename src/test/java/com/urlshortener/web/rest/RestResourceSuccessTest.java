@@ -37,32 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ContextConfiguration(classes = {AppConfig.class, LocalAppConfig.class, WebConfig.class, SecurityConfig.class})
-@WebAppConfiguration
-@RunWith(SpringJUnit4ClassRunner.class)
-@Sql(scripts = "classpath:db/h2/initDB.sql")
-public class RestResourceTest {
-    private static final String ACCOUNT_NAME = "first";
-    private static final String ACCOUNT_NAME_2 = "second";
-    private static final String URL = "http://test.com";
-    private static final UrlRegisterRequest URL_REGISTER_REQUEST = new UrlRegisterRequest(URL);
-    private static final TestUtils.StringLengthMatcher PASSWORD_LENGTH_MATCHER =
-            new TestUtils.StringLengthMatcher(PASSWORD_LENGTH);
-
-    private MockMvc mockMvc;
-
-    @Autowired
-    private AccountService service;
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
-
-    @PostConstruct
-    void postConstruct() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
-                .apply(springSecurity())
-                .build();
-    }
+public class RestResourceSuccessTest extends AbstractRestResourceTest {
 
     @Test
     public void testCreateAccount() throws Exception {
@@ -77,23 +52,6 @@ public class RestResourceTest {
     }
 
     @Test
-    public void testCreateAccountDuplicate() throws Exception {
-        service.createAccount(ACCOUNT_NAME);
-
-        TestUtils.print(mockMvc.perform(post(RestResource.ACCOUNT_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(new AccountRequest(ACCOUNT_NAME)))))
-                .andExpect(status().isConflict())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.success", is(false)))
-                .andExpect(jsonPath("$.description", equalTo(ACCOUNT_CREATE_FAILURE_DESCRIPTION)))
-                .andExpect(jsonPath("$.password").doesNotExist());
-    }
-
-    //TODO: invalid name
-    //TODO: invalid JSON
-
-    @Test
     public void testRegisterUrl() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);
 
@@ -105,39 +63,6 @@ public class RestResourceTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.shortUrl").exists());
         //TODO: validate more of payload
-    }
-
-    @Test
-    public void testRegisterUrlNoAuthenticationHeader() throws Exception {
-        TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string(isEmptyString()));
-    }
-
-    @Test
-    public void testRegisterUrlWrongAuthenticationHeader() throws Exception {
-        Account account = service.createAccount(ACCOUNT_NAME);
-        TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
-                .with(TestUtils.userHttpBasic(account.getName(), "somepass"))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(URL_REGISTER_REQUEST)))
-                .andExpect(status().isUnauthorized()))
-                .andExpect(content().string(isEmptyString()));
-    }
-
-    @Test
-    public void testRegisterUrlDuplicate() throws Exception {
-        Account account = service.createAccount(ACCOUNT_NAME);
-        service.registerUrl(URL, MOVED_PERMANENTLY, account.getName());
-
-        TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
-                .with(TestUtils.userHttpBasic(account))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
-                .andExpect(status().isConflict())
-                .andExpect(content().string(isEmptyString()));
     }
 
     //TODO: same URL for other account okay
@@ -156,20 +81,11 @@ public class RestResourceTest {
     }
 
     @Test
-    public void testGetStatisticsNoAuthenticationHeader() throws Exception {
-        TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
-                .andExpect(status().isUnauthorized())
-                .andExpect(content().string(isEmptyString()));
-    }
-
-    @Test
     public void testGetStatistics() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);
         String shortUrl = service.registerUrl(URL, MOVED_PERMANENTLY, account.getName());
-        service.hitShortUrl(shortUrl, ACCOUNT_NAME);
-        service.hitShortUrl(shortUrl, ACCOUNT_NAME);
+        service.hitShortUrl(shortUrl);
+        service.hitShortUrl(shortUrl);
 
         TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME)
                 .with(TestUtils.userHttpBasic(account))

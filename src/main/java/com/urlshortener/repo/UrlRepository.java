@@ -1,6 +1,7 @@
 package com.urlshortener.repo;
 
 import com.urlshortener.model.Account;
+import com.urlshortener.model.RedirectType;
 import com.urlshortener.model.UrlMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -11,14 +12,12 @@ import java.util.Optional;
 
 public interface UrlRepository extends JpaRepository<UrlMapping, Integer> {
 
-    List<UrlMapping> findByAccount(Account account);
+    List<UrlMapping> findByAccounts(List<Account> accounts);
+//
+//    Optional<UrlMapping> findByTargetUrlAndAccount(String targetUrl, Account account);
+//
+    Optional<UrlMapping> findByShortUrl(String shortUrl);
 
-    Optional<UrlMapping> findByTargetUrlAndAccount(String targetUrl, Account account);
-
-    //TODO: cannot lock several tables for update, at least in H2
-    //TODO: rename
-    //TODO: better performance?
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<UrlMapping> findByShortUrlAndAccount(String shortUrl, Account account);
+    Optional<UrlMapping> findByTargetUrlAndRedirectType(String targetUrl, RedirectType redirectType);
 
 }

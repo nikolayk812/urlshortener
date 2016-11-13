@@ -106,7 +106,7 @@ public class AccountServiceImplTest {
         String shortUrl = service.registerUrl(URL, MOVED_PERMANENTLY, ACCOUNT_NAME);
         service.registerUrl("http://test2.com", MOVED_PERMANENTLY, ACCOUNT_NAME);
 
-        service.hitShortUrl(shortUrl, ACCOUNT_NAME);
+        service.hitShortUrl(shortUrl);
         Map<String, Integer> stats = service.getUrlRedirectStats(ACCOUNT_NAME);
         assertEquals("Wrong URL stats size", 2, stats.size());
         assertEquals("Wrong redirect counter", 1, stats.get(URL).intValue());
@@ -114,12 +114,12 @@ public class AccountServiceImplTest {
 
     @Test(expected = NotFoundException.class)
     public void testInvalidShortUrl() throws Exception {
-        service.hitShortUrl("wrong", ACCOUNT_NAME); //must be 6 symbols
+        service.hitShortUrl("wrong"); //must be 6 symbols
     }
 
     @Test(expected = NotFoundException.class)
     public void testAbsentShortUrl() throws Exception {
-        service.hitShortUrl("wrong1", ACCOUNT_NAME);
+        service.hitShortUrl("wrong1");
     }
 
 }

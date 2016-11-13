@@ -2,25 +2,18 @@ package com.urlshortener.model;
 
 import org.hibernate.validator.constraints.URL;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import java.util.List;
 
 import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 
 @Entity
-@Table(name = "short_urls")
+@Table(name = "short_urls",
+        uniqueConstraints = {@UniqueConstraint(name = "unique_target_url_redirect_type",
+                columnNames = {"target_url", "redirect_type"})})
 public class UrlMapping {
 
     @Id
@@ -44,23 +37,20 @@ public class UrlMapping {
     @Column(name = "redirect_type", nullable = false)
     private RedirectType redirectType;
 
-    //TODO: prevent loses!!
-    //TODO: move to other class
-    @Column(name = "redirect_counter")
-    private int redirectCounter;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_id")
-    private Account account;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinTable(name = "account_short_urls",
+            joinColumns = @JoinColumn(name = "short_url_id"),
+            inverseJoinColumns = @JoinColumn(name = "account_id"))
+    private List<Account> accounts;
 
     public UrlMapping() {
     }
 
-    public UrlMapping(String targetUrl, RedirectType redirectType, String shortUrl, Account account) {
+    public UrlMapping(String shortUrl, String targetUrl, RedirectType redirectType, List<Account> accounts) {
         this.shortUrl = shortUrl;
         this.targetUrl = targetUrl;
         this.redirectType = redirectType;
-        this.account = account;
+        this.accounts = accounts;
     }
 
     public String getShortUrl() {
@@ -87,14 +77,6 @@ public class UrlMapping {
         this.redirectType = redirectType;
     }
 
-    public int getRedirectCounter() {
-        return redirectCounter;
-    }
-
-    public void setRedirectCounter(int redirectCounter) {
-        this.redirectCounter = redirectCounter;
-    }
-
     public Integer getId() {
         return id;
     }
@@ -103,12 +85,12 @@ public class UrlMapping {
         this.id = id;
     }
 
-    public Account getAccount() {
-        return account;
+    public List<Account> getAccounts() {
+        return accounts;
     }
 
-    public void setAccount(Account account) {
-        this.account = account;
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
     }
 
     //TODO: equals, hashCode, toString

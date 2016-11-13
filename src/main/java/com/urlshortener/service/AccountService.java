@@ -42,6 +42,6 @@ public interface AccountService {
     Map<String, Integer> getUrlRedirectStats(String accountName);
 
 
-    UrlMapping hitShortUrl(String shortUrl, String accountName);
+    UrlMapping hitShortUrl(String shortUrl);
 
 }

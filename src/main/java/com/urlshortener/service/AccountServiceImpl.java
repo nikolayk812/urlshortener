@@ -26,6 +26,7 @@ import java.util.Optional;
 
 import static com.urlshortener.util.Constants.*;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toMap;
 
 @Service
@@ -59,15 +60,27 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepo.findOneByName(accountName)
                 .orElseThrow(() -> new NotFoundException(accountName));
 
-        urlRepo.findByTargetUrlAndAccount(targetUrl, account)
-                .ifPresent(urlMapping -> {
-                    throw new UrlDuplicateException("Duplicate url for account", targetUrl);
-                });
+        UrlMapping urlMapping;
+        String shortUrl;
+        Optional<UrlMapping> urlMappingOptional = urlRepo.findByTargetUrlAndRedirectType(targetUrl, redirectType);
+        if (urlMappingOptional.isPresent()) {
+            urlMapping = urlMappingOptional.get();
+            Optional<String> accountNameOptional = urlMapping.getAccounts().stream()
+                    .map(Account::getName)
+                    .filter(an -> an.equals(accountName))
+                    .findAny();
+            if (accountNameOptional.isPresent()) {
+                throw new UrlDuplicateException("Duplicate url", targetUrl);
+            } else {
+                urlMapping.getAccounts().add(account);
+                shortUrl = urlMapping.getShortUrl();
+            }
+        } else {
+            shortUrl = RandomStringGenerator.generate(SHORT_URL_LENGTH);
+            //TODO: it might be duplicate!!!
+            urlMapping = new UrlMapping(shortUrl, targetUrl, redirectType, singletonList(account));
+        }
 
-        String shortUrl = RandomStringGenerator.generate(SHORT_URL_LENGTH);
-        //TODO: it might be duplicate!!!
-
-        UrlMapping urlMapping = new UrlMapping(targetUrl, redirectType, shortUrl, account);
         urlRepo.save(urlMapping);
         return shortUrl;
     }
@@ -78,26 +91,25 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepo.findOneByName(accountName)
                 .orElseThrow(() -> new NotFoundException(accountName));
 
-        List<UrlMapping> list = urlRepo.findByAccount(account);
+        List<UrlMapping> list = urlRepo.findByAccounts(singletonList(account));
         return list.stream().collect(
                 toMap(
                         UrlMapping::getTargetUrl,
-                        UrlMapping::getRedirectCounter
+                        um -> 0 //TODO: from cache
                 )
         );
     }
 
     @Override
-    public UrlMapping hitShortUrl(String shortUrl, String accountName) {
+    public UrlMapping hitShortUrl(String shortUrl) {
         if (shortUrl.length() != SHORT_URL_LENGTH)
             throw new NotFoundException(shortUrl);
 
-        Account account = accountRepo.findOneByName(accountName).get();
-        UrlMapping urlMapping = urlRepo.findByShortUrlAndAccount(shortUrl, account)
-                .orElseThrow(() -> new NotFoundException(shortUrl));//TODO: expcetion of other type
-
-        urlMapping.setRedirectCounter(urlMapping.getRedirectCounter() + 1);
-        return urlRepo.save(urlMapping);
+        Optional<UrlMapping> shortUrlOptional = urlRepo.findByShortUrl(shortUrl);
+        return shortUrlOptional.map(urlMapping -> {
+            //TODO: cache counting
+            return urlMapping;
+        }).orElseThrow(() -> new NotFoundException(shortUrl));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)

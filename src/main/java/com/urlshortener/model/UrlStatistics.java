@@ -1,14 +1,15 @@
 package com.urlshortener.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "stats")
 public class UrlStatistics {
+
+    @Id
+    @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
+    private Integer id;
 
     @Column(name = "hit_counter")
     private int hitCounter;
@@ -35,5 +36,13 @@ public class UrlStatistics {
 
     public void setUrlMapping(UrlMapping urlMapping) {
         this.urlMapping = urlMapping;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 }

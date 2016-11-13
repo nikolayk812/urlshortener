@@ -69,17 +69,12 @@ public class RestResource {
                 }).orElseThrow(() -> new UsernameNotFoundException("")); //TODO:
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping(value = "/{shortUrl}")
-    public void redirect(@PathVariable("shortUrl") String shortUrl) {
-        SecurityUtils.getCurrentAccountName()
-                .map(accountName -> {
-                    UrlMapping urlMapping = service.hitShortUrl(shortUrl, accountName);
-                    RedirectView redirectView = new RedirectView(shortUrl);
-                    redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));
-                    return new ModelAndView(redirectView);
-
-                }).orElseThrow(() -> new UsernameNotFoundException("")); //TODO:
+    public ModelAndView redirect(@PathVariable("shortUrl") String shortUrl) {
+        UrlMapping urlMapping = service.hitShortUrl(shortUrl);
+        RedirectView redirectView = new RedirectView(shortUrl);
+        redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));
+        return new ModelAndView(redirectView);
     }
 
 
