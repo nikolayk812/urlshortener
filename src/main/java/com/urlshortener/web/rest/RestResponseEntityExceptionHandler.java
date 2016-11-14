@@ -31,9 +31,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(ShortUrlNotFoundException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public ErrorInfo notFound(HttpServletRequest req, ShortUrlNotFoundException e) {
+    public void notFound(HttpServletRequest req, ShortUrlNotFoundException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
-        return new ErrorInfo(req.getRequestURL(), e);
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409

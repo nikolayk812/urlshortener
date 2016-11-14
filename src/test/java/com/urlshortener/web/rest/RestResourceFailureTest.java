@@ -21,7 +21,7 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
 
     @Test
     public void testCreateAccountDuplicate() throws Exception {
-        service.createAccount(ACCOUNT_NAME);
+        accountService.createAccount(ACCOUNT_NAME);
 
         TestUtils.print(mockMvc.perform(post(RestResource.ACCOUNT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
@@ -52,7 +52,7 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
 
     @Test
     public void testRegisterUrlWrongAuthenticationHeader() throws Exception {
-        Account account = service.createAccount(ACCOUNT_NAME);
+        Account account = accountService.createAccount(ACCOUNT_NAME);
         TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
                 .with(TestUtils.userHttpBasic(account.getName(), "somepass"))
                 .contentType(MediaType.APPLICATION_JSON)
@@ -63,8 +63,8 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
 
     @Test
     public void testRegisterUrlDuplicate() throws Exception {
-        Account account = service.createAccount(ACCOUNT_NAME);
-        service.registerUrl(URL, FOUND, account.getName());
+        Account account = accountService.createAccount(ACCOUNT_NAME);
+        accountService.registerUrl(URL, FOUND, account.getName());
 
         TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
                 .with(TestUtils.userHttpBasic(account))

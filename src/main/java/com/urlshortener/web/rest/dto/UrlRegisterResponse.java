@@ -6,7 +6,6 @@ public class UrlRegisterResponse {
     public UrlRegisterResponse() {
     }
 
-    //TODO: factory method
     public UrlRegisterResponse(String shortUrl) {
         this.shortUrl = shortUrl;
     }

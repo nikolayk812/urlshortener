@@ -7,7 +7,7 @@ import java.util.Optional;
 public class UrlRegisterRequest {
     private String url;
 
-    //TODO: JsonEnumDefaultValue
+    //TODO: try JsonEnumDefaultValue
     private Optional<RedirectType> redirectType = Optional.empty();
 
     public UrlRegisterRequest() {

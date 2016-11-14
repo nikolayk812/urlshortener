@@ -34,6 +34,7 @@ public abstract class AbstractRestResourceTest {
     static final String ACCOUNT_NAME = "first";
     static final String ACCOUNT_NAME_2 = "second";
     static final String URL = "http://test.com";
+    static final String URL_2 = "http://test2.com";
     static final UrlRegisterRequest URL_REGISTER_REQUEST = new UrlRegisterRequest(URL);
     static final TestUtils.StringLengthMatcher PASSWORD_LENGTH_MATCHER =
             new TestUtils.StringLengthMatcher(PASSWORD_LENGTH);
@@ -43,10 +44,10 @@ public abstract class AbstractRestResourceTest {
     protected MockMvc mockMvc;
 
     @Autowired
-    protected AccountService service;
+    protected AccountService accountService;
 
     @Autowired
-    protected UrlService urlService;
+    protected UrlService urlMappingService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;

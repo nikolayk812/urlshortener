@@ -25,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.Map;
 
 @RestController
@@ -57,7 +58,7 @@ public class RestResource {
                 .map(accountName -> {
                     String shortUrl = service.registerUrl(request.getUrl(), request.getRedirectTypeOrDefault(), accountName);
                     return new ResponseEntity<>(new UrlRegisterResponse(shortUrl), HttpStatus.CREATED);
-                }).orElseThrow(() -> new UsernameNotFoundException("")); //TODO:
+                }).orElseThrow(() -> new UsernameNotFoundException("Not authorized"));
     }
 
     @PreAuthorize("isFullyAuthenticated()")
@@ -66,15 +67,20 @@ public class RestResource {
         return SecurityUtils.getCurrentAccountName()
                 .map(accountName -> {
                     if (!accountName.equals(accountId))
-                        throw new UsernameNotFoundException(""); //TODO:
+                        throw new UsernameNotFoundException("Requested statistics for other account " + accountId);
 
                     Map<String, Integer> stats = service.getUrlRedirectStats(accountName);
                     return new ResponseEntity<>(new StatisticsResponse(stats), HttpStatus.OK);
-                }).orElseThrow(() -> new UsernameNotFoundException("")); //TODO:
+                }).orElseThrow(() -> new UsernameNotFoundException("Not authorized"));
     }
 
     @GetMapping(value = "/{shortUrl}")
     public ModelAndView redirect(@PathVariable("shortUrl") String shortUrl) {
+        if (shortUrl.isEmpty() || shortUrl.equalsIgnoreCase("index")) {
+            //TODO: fix!
+            return new ModelAndView("index.html", Collections.emptyMap(), HttpStatus.OK);
+        }
+
         UrlMapping urlMapping = urlService.hitShortUrl(shortUrl);
         RedirectView redirectView = new RedirectView(urlMapping.getTargetUrl());
         redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));
