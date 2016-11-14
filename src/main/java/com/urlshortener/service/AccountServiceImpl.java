@@ -36,11 +36,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
 
     private final AccountRepository accountRepo;
     private final UrlRepository urlRepo;
+    private final UrlHitCountingCache cache;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepo, UrlRepository urlRepo) {
+    public AccountServiceImpl(AccountRepository accountRepo, UrlRepository urlRepo, UrlHitCountingCache cache) {
         this.accountRepo = accountRepo;
         this.urlRepo = urlRepo;
+        this.cache = cache;
     }
 
 
@@ -95,21 +97,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         return list.stream().collect(
                 toMap(
                         UrlMapping::getTargetUrl,
-                        um -> 0 //TODO: from cache
+                        um -> cache.getCount(um.getTargetUrl())
                 )
         );
-    }
-
-    @Override
-    public UrlMapping hitShortUrl(String shortUrl) {
-        if (shortUrl.length() != SHORT_URL_LENGTH)
-            throw new NotFoundException(shortUrl);
-
-        Optional<UrlMapping> shortUrlOptional = urlRepo.findByShortUrl(shortUrl);
-        return shortUrlOptional.map(urlMapping -> {
-            //TODO: cache counting
-            return urlMapping;
-        }).orElseThrow(() -> new NotFoundException(shortUrl));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)

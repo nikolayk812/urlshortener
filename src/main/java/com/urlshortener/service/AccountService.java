@@ -2,7 +2,6 @@ package com.urlshortener.service;
 
 import com.urlshortener.model.Account;
 import com.urlshortener.model.RedirectType;
-import com.urlshortener.model.UrlMapping;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
 import com.urlshortener.service.exceptions.UrlDuplicateException;
 
@@ -40,8 +39,5 @@ public interface AccountService {
      */
     //TODO: not map?
     Map<String, Integer> getUrlRedirectStats(String accountName);
-
-
-    UrlMapping hitShortUrl(String shortUrl);
 
 }

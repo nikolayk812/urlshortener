@@ -4,6 +4,7 @@ package com.urlshortener.web.rest;
 import com.urlshortener.model.Account;
 import com.urlshortener.model.UrlMapping;
 import com.urlshortener.service.AccountService;
+import com.urlshortener.service.UrlService;
 import com.urlshortener.web.rest.dto.AccountRequest;
 import com.urlshortener.web.rest.dto.AccountResponse;
 import com.urlshortener.web.rest.dto.StatisticsResponse;
@@ -34,6 +35,9 @@ public class RestResource {
 
     @Autowired
     private AccountService service;
+
+    @Autowired
+    private UrlService urlService;
 
 
     //TODO: handle error
@@ -71,8 +75,8 @@ public class RestResource {
 
     @GetMapping(value = "/{shortUrl}")
     public ModelAndView redirect(@PathVariable("shortUrl") String shortUrl) {
-        UrlMapping urlMapping = service.hitShortUrl(shortUrl);
-        RedirectView redirectView = new RedirectView(shortUrl);
+        UrlMapping urlMapping = urlService.hitShortUrl(shortUrl);
+        RedirectView redirectView = new RedirectView(urlMapping.getTargetUrl());
         redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));
         return new ModelAndView(redirectView);
     }

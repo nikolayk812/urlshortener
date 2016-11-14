@@ -3,6 +3,7 @@ package com.urlshortener.web.rest;
 import com.urlshortener.AppConfig;
 import com.urlshortener.LocalAppConfig;
 import com.urlshortener.service.AccountService;
+import com.urlshortener.service.UrlService;
 import com.urlshortener.util.TestUtils;
 import com.urlshortener.web.SecurityConfig;
 import com.urlshortener.web.WebConfig;
@@ -27,17 +28,20 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/h2/initDB.sql")
 public abstract class AbstractRestResourceTest {
-    protected static final String ACCOUNT_NAME = "first";
-    protected static final String ACCOUNT_NAME_2 = "second";
-    protected static final String URL = "http://test.com";
-    protected static final UrlRegisterRequest URL_REGISTER_REQUEST = new UrlRegisterRequest(URL);
-    protected static final TestUtils.StringLengthMatcher PASSWORD_LENGTH_MATCHER =
+    static final String ACCOUNT_NAME = "first";
+    static final String ACCOUNT_NAME_2 = "second";
+    static final String URL = "http://test.com";
+    static final UrlRegisterRequest URL_REGISTER_REQUEST = new UrlRegisterRequest(URL);
+    static final TestUtils.StringLengthMatcher PASSWORD_LENGTH_MATCHER =
             new TestUtils.StringLengthMatcher(PASSWORD_LENGTH);
 
     protected MockMvc mockMvc;
 
     @Autowired
     protected AccountService service;
+
+    @Autowired
+    protected UrlService urlService;
 
     @Autowired
     private WebApplicationContext webApplicationContext;

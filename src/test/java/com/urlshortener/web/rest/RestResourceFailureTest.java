@@ -6,7 +6,7 @@ import com.urlshortener.web.rest.dto.AccountRequest;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
-import static com.urlshortener.model.RedirectType.MOVED_PERMANENTLY;
+import static com.urlshortener.model.RedirectType.FOUND;
 import static com.urlshortener.util.Constants.ACCOUNT_CREATE_FAILURE_DESCRIPTION;
 import static com.urlshortener.web.rest.RestResource.REGISTER_URL_PATH;
 import static com.urlshortener.web.rest.RestResource.STATISTICS_PATH;
@@ -59,7 +59,7 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
     @Test
     public void testRegisterUrlDuplicate() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);
-        service.registerUrl(URL, MOVED_PERMANENTLY, account.getName());
+        service.registerUrl(URL, FOUND, account.getName());
 
         TestUtils.print(mockMvc.perform(post(REGISTER_URL_PATH)
                 .with(TestUtils.userHttpBasic(account))

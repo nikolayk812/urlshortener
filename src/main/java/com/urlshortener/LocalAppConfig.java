@@ -1,5 +1,6 @@
 package com.urlshortener;
 
+import com.urlshortener.service.UrlHitCountingCache;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,11 @@ public class LocalAppConfig extends AppConfig {
     @Bean
     public DataSource dataSource() {
         return createHikariDataSource(url, username, password);
+    }
+
+    @Bean
+    public UrlHitCountingCache cache() {
+        return new UrlHitCountingCache();
     }
 
 }

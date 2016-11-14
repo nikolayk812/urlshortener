@@ -22,6 +22,11 @@ public class UrlStatistics {
     public UrlStatistics() {
     }
 
+    public UrlStatistics(int hitCounter, UrlMapping urlMapping) {
+        this.hitCounter = hitCounter;
+        this.urlMapping = urlMapping;
+    }
+
     public int getHitCounter() {
         return hitCounter;
     }
