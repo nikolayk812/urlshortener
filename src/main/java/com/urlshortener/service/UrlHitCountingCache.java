@@ -4,7 +4,7 @@ import com.google.common.cache.RemovalNotification;
 import com.urlshortener.model.RedirectType;
 import com.urlshortener.model.UrlMapping;
 import com.urlshortener.model.UrlStatistics;
-import com.urlshortener.repo.UrlRepository;
+import com.urlshortener.repo.UrlMappingRepository;
 import com.urlshortener.repo.UrlStatisticsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class UrlHitCountingCache extends HitCountingCache<String>{
 
     @Autowired
-    private UrlRepository urlRepo;
+    private UrlMappingRepository urlMappingRepo;
 
     @Autowired
     private UrlStatisticsRepository urlStatsRepo;
 
     @Override
     protected AtomicInteger loadImpl(String key) throws Exception {
-        Optional<UrlMapping> urlMappingOptional = urlRepo.findByTargetUrlAndRedirectType(key, RedirectType.FOUND);
+        Optional<UrlMapping> urlMappingOptional = urlMappingRepo.findByTargetUrlAndRedirectType(key, RedirectType.FOUND);
         return urlMappingOptional.map(urlMapping -> {
             Optional<UrlStatistics> urlStatistics = urlStatsRepo.findByUrlMapping(urlMapping);
             if (urlStatistics.isPresent()) {
@@ -34,7 +34,7 @@ public class UrlHitCountingCache extends HitCountingCache<String>{
 
     @Override
     protected void onRemovalImpl(RemovalNotification<String, AtomicInteger> removalNotification) {
-        Optional<UrlMapping> urlMapping = urlRepo.findByTargetUrlAndRedirectType(removalNotification.getKey(), RedirectType.FOUND);
+        Optional<UrlMapping> urlMapping = urlMappingRepo.findByTargetUrlAndRedirectType(removalNotification.getKey(), RedirectType.FOUND);
         UrlStatistics urlStatistics = new UrlStatistics(removalNotification.getValue().get(), urlMapping.get());
         urlStatsRepo.save(urlStatistics);
     }

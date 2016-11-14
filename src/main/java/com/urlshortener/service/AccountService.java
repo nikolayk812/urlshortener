@@ -3,7 +3,7 @@ package com.urlshortener.service;
 import com.urlshortener.model.Account;
 import com.urlshortener.model.RedirectType;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
-import com.urlshortener.service.exceptions.UrlDuplicateException;
+import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
 
 import java.util.Map;
 
@@ -30,14 +30,14 @@ public interface AccountService {
      * @param accountName account name owning the mapping from target to short URL
      * @return short URL created
      */
-    String registerUrl(String url, RedirectType redirectType, String accountName) throws UrlDuplicateException;
+    String registerUrl(String url, RedirectType redirectType, String accountName) throws TargetUrlDuplicateException;
 
     /**
+     * Retrieves URL redirect statistics for account specified
      *
-     * @param accountName
-     * @return
+     * @param accountName account name
+     * @return map from target URL to redirect count
      */
-    //TODO: not map?
     Map<String, Integer> getUrlRedirectStats(String accountName);
 
 }

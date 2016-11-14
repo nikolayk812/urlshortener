@@ -1,8 +1,8 @@
 package com.urlshortener.web.rest;
 
 import com.urlshortener.service.exceptions.AccountDuplicateException;
-import com.urlshortener.service.exceptions.NotFoundException;
-import com.urlshortener.service.exceptions.UrlDuplicateException;
+import com.urlshortener.service.exceptions.ShortUrlNotFoundException;
+import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
 import com.urlshortener.web.rest.dto.AccountCreateResponse;
 import com.urlshortener.web.rest.dto.ErrorInfo;
 import org.slf4j.Logger;
@@ -11,6 +11,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,10 +28,10 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     private final static Logger log = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundException.class)
+    @ExceptionHandler(ShortUrlNotFoundException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE)
-    public ErrorInfo notFound(HttpServletRequest req, NotFoundException e) {
+    public ErrorInfo notFound(HttpServletRequest req, ShortUrlNotFoundException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
         return new ErrorInfo(req.getRequestURL(), e);
     }
@@ -63,10 +64,18 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
-    @ExceptionHandler(UrlDuplicateException.class)
+    @ExceptionHandler(TargetUrlDuplicateException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 4)
-    void duplicateAccount(HttpServletRequest req, UrlDuplicateException e) {
+    void duplicateAccount(HttpServletRequest req, TargetUrlDuplicateException e) {
+        log.error("Exception at request " + req.getRequestURL(), e);
+    }
+
+    @ResponseStatus(value = HttpStatus.UNAUTHORIZED) //401
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseBody
+    @Order(Ordered.HIGHEST_PRECEDENCE + 5)
+    void duplicateAccount(HttpServletRequest req, UsernameNotFoundException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
     }
 

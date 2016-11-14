@@ -4,10 +4,10 @@ import com.urlshortener.model.Account;
 import com.urlshortener.model.RedirectType;
 import com.urlshortener.model.UrlMapping;
 import com.urlshortener.repo.AccountRepository;
-import com.urlshortener.repo.UrlRepository;
+import com.urlshortener.repo.UrlMappingRepository;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
-import com.urlshortener.service.exceptions.NotFoundException;
-import com.urlshortener.service.exceptions.UrlDuplicateException;
+import com.urlshortener.service.exceptions.AccountNotFoundException;
+import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
 import com.urlshortener.util.RandomStringGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +36,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final static int MAX_GENERATION_ATTEMPTS = 10;
 
     private final AccountRepository accountRepo;
-    private final UrlRepository urlRepo;
+    private final UrlMappingRepository urlMappingRepo;
     private final UrlHitCountingCache cache;
 
     @Autowired
-    public AccountServiceImpl(AccountRepository accountRepo, UrlRepository urlRepo, UrlHitCountingCache cache) {
+    public AccountServiceImpl(AccountRepository accountRepo, UrlMappingRepository urlMappingRepo, UrlHitCountingCache cache) {
         this.accountRepo = accountRepo;
-        this.urlRepo = urlRepo;
+        this.urlMappingRepo = urlMappingRepo;
         this.cache = cache;
     }
 
@@ -62,11 +62,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     @Override
     public String registerUrl(String targetUrl, RedirectType redirectType, String accountName) {
         Account account = accountRepo.findOneByName(accountName)
-                .orElseThrow(() -> new NotFoundException(accountName));
+                .orElseThrow(() -> new AccountNotFoundException("Cannot register target URL: " + targetUrl, accountName));
 
         UrlMapping urlMapping;
         String shortUrl;
-        Optional<UrlMapping> urlMappingOptional = urlRepo.findByTargetUrlAndRedirectType(targetUrl, redirectType);
+        Optional<UrlMapping> urlMappingOptional = urlMappingRepo.findByTargetUrlAndRedirectType(targetUrl, redirectType);
         if (urlMappingOptional.isPresent()) {
             urlMapping = urlMappingOptional.get();
             Optional<String> accountNameOptional = urlMapping.getAccounts().stream()
@@ -74,7 +74,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                     .filter(an -> an.equals(accountName))
                     .findAny();
             if (accountNameOptional.isPresent()) {
-                throw new UrlDuplicateException("Duplicate url", targetUrl);
+                throw new TargetUrlDuplicateException("Duplicate url", targetUrl);
             } else {
                 urlMapping.getAccounts().add(account);
                 shortUrl = urlMapping.getShortUrl();
@@ -85,14 +85,14 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
             do {
                 attempts++;
                 if (attempts >= MAX_GENERATION_ATTEMPTS)
-                    throw new UrlDuplicateException("Failed to generate unique short URL within " +
+                    throw new TargetUrlDuplicateException("Failed to generate unique short URL within " +
                             MAX_GENERATION_ATTEMPTS + " attempts", targetUrl);
                 shortUrl = RandomStringGenerator.generate(SHORT_URL_LENGTH);
-            } while (urlRepo.findByShortUrl(shortUrl).isPresent());
+            } while (urlMappingRepo.findByShortUrl(shortUrl).isPresent());
             urlMapping = new UrlMapping(shortUrl, targetUrl, redirectType, singletonList(account));
         }
 
-        urlRepo.save(urlMapping);
+        urlMappingRepo.save(urlMapping);
         return shortUrl;
     }
 
@@ -100,9 +100,9 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
     @Override
     public Map<String, Integer> getUrlRedirectStats(String accountName) {
         Account account = accountRepo.findOneByName(accountName)
-                .orElseThrow(() -> new NotFoundException(accountName));
+                .orElseThrow(() -> new AccountNotFoundException("Can not get URL statistics", accountName));
 
-        return urlRepo.findByAccounts(singletonList(account))
+        return urlMappingRepo.findByAccounts(singletonList(account))
                 .stream()
                 .map(UrlMapping::getTargetUrl)
                 .distinct()

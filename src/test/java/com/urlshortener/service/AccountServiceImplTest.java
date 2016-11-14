@@ -4,8 +4,9 @@ import com.urlshortener.AppConfig;
 import com.urlshortener.LocalAppConfig;
 import com.urlshortener.model.Account;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
-import com.urlshortener.service.exceptions.NotFoundException;
-import com.urlshortener.service.exceptions.UrlDuplicateException;
+import com.urlshortener.service.exceptions.AccountNotFoundException;
+import com.urlshortener.service.exceptions.ShortUrlNotFoundException;
+import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -23,7 +24,6 @@ import static com.urlshortener.model.RedirectType.MOVED_PERMANENTLY;
 import static com.urlshortener.util.Constants.PASSWORD_LENGTH;
 import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.fail;
 
 @ContextConfiguration(classes = {AppConfig.class, LocalAppConfig.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -74,7 +74,7 @@ public class AccountServiceImplTest {
         assertEquals("Wrong short url length", SHORT_URL_LENGTH, shortUrl.length());
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test(expected = AccountNotFoundException.class)
     public void testRegisterUrlForAbsentAccount() throws Exception {
         service.registerUrl(URL, MOVED_PERMANENTLY, ACCOUNT_NAME);
     }
@@ -87,7 +87,7 @@ public class AccountServiceImplTest {
         service.registerUrl("some bad url", MOVED_PERMANENTLY, ACCOUNT_NAME);
     }
 
-    @Test(expected = UrlDuplicateException.class)
+    @Test(expected = TargetUrlDuplicateException.class)
     public void testRegisterDuplicateUrl() throws Exception {
         service.createAccount(ACCOUNT_NAME);
         service.registerUrl(URL, MOVED_PERMANENTLY, ACCOUNT_NAME);
@@ -117,12 +117,12 @@ public class AccountServiceImplTest {
         assertEquals("Wrong redirect counter", 1, stats.get(URL).intValue());
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test(expected = ShortUrlNotFoundException.class)
     public void testInvalidShortUrl() throws Exception {
         urlService.hitShortUrl("wrong"); //must be 6 symbols
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test(expected = ShortUrlNotFoundException.class)
     public void testAbsentShortUrl() throws Exception {
         urlService.hitShortUrl("wrong1");
     }

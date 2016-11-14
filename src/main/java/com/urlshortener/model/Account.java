@@ -7,10 +7,6 @@ import javax.persistence.Access;
 import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -21,12 +17,7 @@ import static com.urlshortener.util.Constants.PASSWORD_LENGTH;
 @Entity
 @Table(name = "accounts")
 @Access(AccessType.FIELD)
-public class Account {
-
-    @Id
-    @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
-    private Integer id;
+public class Account extends BaseEntity {
 
     @NotEmpty
     @Pattern(regexp = Constants.ACCOUNT_NAME_REGEX)
@@ -44,14 +35,6 @@ public class Account {
     public Account(String name, String password) {
         this.name = name;
         this.password = password;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -89,7 +72,7 @@ public class Account {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Account{");
-        sb.append("id=").append(id);
+        sb.append("id=").append(getId());
         sb.append(", name='").append(name).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append('}');

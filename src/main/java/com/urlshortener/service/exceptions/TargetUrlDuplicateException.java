@@ -1,9 +1,9 @@
 package com.urlshortener.service.exceptions;
 
-public class UrlDuplicateException extends RuntimeException {
+public class TargetUrlDuplicateException extends RuntimeException {
     private final String targetUrl;
 
-    public UrlDuplicateException(String message, String targetUrl) {
+    public TargetUrlDuplicateException(String message, String targetUrl) {
         super(message);
         this.targetUrl = targetUrl;
     }

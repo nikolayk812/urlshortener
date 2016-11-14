@@ -11,16 +11,14 @@ import java.util.Objects;
 
 import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 
+/**
+ * Mapping between target URL and short URL
+ */
 @Entity
 @Table(name = "short_urls",
         uniqueConstraints = {@UniqueConstraint(name = "unique_target_url_redirect_type",
                 columnNames = {"target_url", "redirect_type"})})
-public class UrlMapping {
-
-    @Id
-    @SequenceGenerator(name = "global_seq", sequenceName = "global_seq", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_seq")
-    private Integer id;
+public class UrlMapping extends BaseEntity {
 
     @Size(min = SHORT_URL_LENGTH, max = SHORT_URL_LENGTH,
             message = "Short url should be exactly " + SHORT_URL_LENGTH + " symbols")
@@ -78,14 +76,6 @@ public class UrlMapping {
         this.redirectType = redirectType;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
     public List<Account> getAccounts() {
         return accounts;
     }
@@ -111,7 +101,7 @@ public class UrlMapping {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("UrlMapping{");
-        sb.append("id=").append(id);
+        sb.append("id=").append(getId());
         sb.append(", shortUrl='").append(shortUrl).append('\'');
         sb.append(", targetUrl='").append(targetUrl).append('\'');
         sb.append(", redirectType=").append(redirectType);

@@ -1,8 +1,8 @@
 package com.urlshortener.service;
 
 import com.urlshortener.model.UrlMapping;
-import com.urlshortener.repo.UrlRepository;
-import com.urlshortener.service.exceptions.NotFoundException;
+import com.urlshortener.repo.UrlMappingRepository;
+import com.urlshortener.service.exceptions.ShortUrlNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,18 +17,18 @@ public class UrlServiceImpl implements UrlService {
     private HitCountingCache<String> cache;
 
     @Autowired
-    private UrlRepository urlRepo;
+    private UrlMappingRepository urlMappingRepo;
 
     @Override
     public UrlMapping hitShortUrl(String shortUrl) {
         if (shortUrl.length() != SHORT_URL_LENGTH)
-            throw new NotFoundException(shortUrl);
+            throw new ShortUrlNotFoundException("Short URL should be of length " + SHORT_URL_LENGTH, shortUrl);
 
-        Optional<UrlMapping> shortUrlOptional = urlRepo.findByShortUrl(shortUrl);
+        Optional<UrlMapping> shortUrlOptional = urlMappingRepo.findByShortUrl(shortUrl);
         return shortUrlOptional.map(urlMapping -> {
             cache.hit(urlMapping.getTargetUrl());
             return urlMapping;
-        }).orElseThrow(() -> new NotFoundException(shortUrl));
+        }).orElseThrow(() -> new ShortUrlNotFoundException("Short URL is not registered earlier", shortUrl));
     }
 
 }
