@@ -78,8 +78,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         log.error("Exception at request " + req.getRequestURL(), e);
     }
 
-
-
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)      //400
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody

@@ -40,4 +40,5 @@ public class LocalAppConfig extends AppConfig {
         databasePopulator.addScript(new ClassPathResource("db/h2/initDB.sql"));
         return databasePopulator;
     }
+
 }
