@@ -12,6 +12,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,7 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
 import java.io.IOException;
 
-@ControllerAdvice(annotations = RestController.class)
+@ControllerAdvice(annotations = {RestController.class, Controller.class})
 public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
     private final static Logger log = LoggerFactory.getLogger(RestResponseEntityExceptionHandler.class);
 
