@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS url_stats;
 DROP TABLE IF EXISTS account_short_urls;
 DROP TABLE IF EXISTS short_urls;
 DROP TABLE IF EXISTS accounts;
@@ -24,4 +25,11 @@ CREATE TABLE account_short_urls (
     short_url_id INTEGER NOT NULL,
     FOREIGN KEY (account_id) REFERENCES accounts (id),
     FOREIGN KEY (short_url_id) REFERENCES short_urls (id)
+);
+
+CREATE TABLE url_stats (
+  id INTEGER DEFAULT global_seq.nextval PRIMARY KEY,
+  url_id INTEGER NOT NULL,
+  hit_counter INTEGER NOT NULL,
+  FOREIGN KEY (url_id) REFERENCES short_urls (id)
 );

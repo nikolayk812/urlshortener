@@ -5,8 +5,9 @@ import com.urlshortener.model.Account;
 import com.urlshortener.model.UrlMapping;
 import com.urlshortener.service.AccountService;
 import com.urlshortener.service.UrlService;
-import com.urlshortener.web.rest.dto.AccountRequest;
-import com.urlshortener.web.rest.dto.AccountResponse;
+import com.urlshortener.service.exceptions.NotFoundException;
+import com.urlshortener.web.rest.dto.AccountCreateRequest;
+import com.urlshortener.web.rest.dto.AccountCreateResponse;
 import com.urlshortener.web.rest.dto.StatisticsResponse;
 import com.urlshortener.web.rest.dto.UrlRegisterRequest;
 import com.urlshortener.web.rest.dto.UrlRegisterResponse;
@@ -27,26 +28,28 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.validation.Valid;
 import java.util.Map;
 
+import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
+
 @RestController
 public class RestResource {
-    public static final String ACCOUNT_PATH = "/account";
-    public static final String REGISTER_URL_PATH = "/register";
-    public static final String STATISTICS_PATH = "/statistics";
+    static final String ACCOUNT_PATH = "/account";
+    static final String REGISTER_URL_PATH = "/register";
+    static final String STATISTICS_PATH = "/statistics";
+
+    private final AccountService service;
+    private final UrlService urlService;
 
     @Autowired
-    private AccountService service;
-
-    @Autowired
-    private UrlService urlService;
-
-
-    //TODO: handle error
+    public RestResource(AccountService service, UrlService urlService) {
+        this.service = service;
+        this.urlService = urlService;
+    }
 
     @PostMapping(value = ACCOUNT_PATH)
-    public ResponseEntity<AccountResponse> createAccount(@RequestBody @Valid AccountRequest request) {
+    public ResponseEntity<AccountCreateResponse> createAccount(@RequestBody @Valid AccountCreateRequest request) {
         Account account = service.createAccount(request.getAccountId());
         return new ResponseEntity<>(
-                AccountResponse.success(account.getPassword()),
+                AccountCreateResponse.success(account.getPassword()),
                 HttpStatus.CREATED);
     }
 
@@ -75,6 +78,9 @@ public class RestResource {
 
     @GetMapping(value = "/{shortUrl}")
     public ModelAndView redirect(@PathVariable("shortUrl") String shortUrl) {
+        if (shortUrl.length() != SHORT_URL_LENGTH)
+            throw new NotFoundException(shortUrl);
+
         UrlMapping urlMapping = urlService.hitShortUrl(shortUrl);
         RedirectView redirectView = new RedirectView(urlMapping.getTargetUrl());
         redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));

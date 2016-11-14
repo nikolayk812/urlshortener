@@ -9,8 +9,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+//TODO: Tx Context?
 public abstract class HitCountingCache<T> {
-    protected final LoadingCache<T, AtomicInteger> cache;
+    private final LoadingCache<T, AtomicInteger> cache;
 
     HitCountingCache() {
         //TODO: move values to properties

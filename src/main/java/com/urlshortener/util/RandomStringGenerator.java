@@ -5,18 +5,18 @@ import com.google.common.base.Preconditions;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-//TODO: test
-
 /**
+ * Random String generator
+ *
  * Inspired by {@code http://stackoverflow.com/a/41156/1360074}
  */
 public class RandomStringGenerator {
     private static final SecureRandom random = new SecureRandom();
 
     /**
-     * TODO:
+     * Generates random string of target length
      *
-     * @return
+     * @return string generated
      */
     public static String generate(int targetLength) {
         Preconditions.checkArgument(targetLength > 0);

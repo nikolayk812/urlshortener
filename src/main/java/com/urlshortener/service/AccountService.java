@@ -23,12 +23,12 @@ public interface AccountService {
     Account createAccount(String accountName) throws AccountDuplicateException;
 
     /**
-     * TODO:
+     * Registers new target URL for redirection, short URL is created
      *
-     * @param url
-     * @param redirectType
-     * @param accountName
-     * @return
+     * @param url target URL
+     * @param redirectType redirect type
+     * @param accountName account name owning the mapping from target to short URL
+     * @return short URL created
      */
     String registerUrl(String url, RedirectType redirectType, String accountName) throws UrlDuplicateException;
 

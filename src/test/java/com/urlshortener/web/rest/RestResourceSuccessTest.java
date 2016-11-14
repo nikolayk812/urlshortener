@@ -2,10 +2,11 @@ package com.urlshortener.web.rest;
 
 import com.urlshortener.model.Account;
 import com.urlshortener.util.TestUtils;
-import com.urlshortener.web.rest.dto.AccountRequest;
-import com.urlshortener.web.rest.dto.AccountResponse;
+import com.urlshortener.web.rest.dto.AccountCreateRequest;
+import com.urlshortener.web.rest.dto.AccountCreateResponse;
 import org.junit.Test;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static com.urlshortener.model.RedirectType.FOUND;
 import static com.urlshortener.model.RedirectType.MOVED_PERMANENTLY;
@@ -23,11 +24,11 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
     public void testCreateAccount() throws Exception {
         TestUtils.print(mockMvc.perform(post(RestResource.ACCOUNT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(new AccountRequest(ACCOUNT_NAME)))))
+                .content(TestUtils.toJson(new AccountCreateRequest(ACCOUNT_NAME)))))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(true)))
-                .andExpect(jsonPath("$.description", equalTo(AccountResponse.SUCCESS_DESCRIPTION)))
+                .andExpect(jsonPath("$.description", equalTo(AccountCreateResponse.SUCCESS_DESCRIPTION)))
                 .andExpect(jsonPath("$.password", PASSWORD_LENGTH_MATCHER));
     }
 
@@ -41,8 +42,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.shortUrl").exists());
-        //TODO: validate more of payload
+                .andExpect(jsonPath("$.shortUrl", SHORT_URL_LENGTH_MATCHER));
     }
 
     @Test
@@ -56,8 +56,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.shortUrl").exists());
-        //TODO: validate more of payload
+                .andExpect(jsonPath("$.shortUrl", SHORT_URL_LENGTH_MATCHER));
     }
 
     @Test
@@ -72,8 +71,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.shortUrl").exists());
-        //TODO: validate more of payload
+                .andExpect(jsonPath("$.shortUrl", SHORT_URL_LENGTH_MATCHER));
     }
 
 
@@ -90,6 +88,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .andExpect(jsonPath("$.['" + URL + "']", equalTo(0))));
     }
 
+    @DirtiesContext
     @Test
     public void testGetStatistics() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);
@@ -105,6 +104,24 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .andExpect(jsonPath("$.['" + URL + "']", equalTo(2))));
     }
 
+    @DirtiesContext
+    @Test
+    public void testGetStatisticsAggregatedForSameUrl() throws Exception {
+        Account account = service.createAccount(ACCOUNT_NAME);
+        String shortUrl = service.registerUrl(URL, FOUND, ACCOUNT_NAME);
+        String shortUrl2 = service.registerUrl(URL, MOVED_PERMANENTLY, ACCOUNT_NAME);
+        urlService.hitShortUrl(shortUrl);
+        urlService.hitShortUrl(shortUrl2);
+
+        TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME)
+                .with(TestUtils.userHttpBasic(account))
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
+                .andExpect(jsonPath("$.['" + URL + "']", equalTo(2))));
+    }
+
+    @DirtiesContext
     @Test
     public void testRedirectFoundStatus() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);
@@ -115,6 +132,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .andExpect(redirectedUrl(URL)));
     }
 
+    @DirtiesContext
     @Test
     public void testRedirectMovedPermanentlyStatus() throws Exception {
         Account account = service.createAccount(ACCOUNT_NAME);

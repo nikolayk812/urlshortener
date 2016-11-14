@@ -3,7 +3,7 @@ package com.urlshortener.web.rest;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
 import com.urlshortener.service.exceptions.NotFoundException;
 import com.urlshortener.service.exceptions.UrlDuplicateException;
-import com.urlshortener.web.rest.dto.AccountResponse;
+import com.urlshortener.web.rest.dto.AccountCreateResponse;
 import com.urlshortener.web.rest.dto.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,9 +57,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(AccountDuplicateException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 3)
-    AccountResponse duplicateAccount(HttpServletRequest req, AccountDuplicateException e) {
+    AccountCreateResponse duplicateAccount(HttpServletRequest req, AccountDuplicateException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
-        return AccountResponse.failure();
+        return AccountCreateResponse.failure();
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409

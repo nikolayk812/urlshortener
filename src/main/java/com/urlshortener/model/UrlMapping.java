@@ -7,6 +7,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import java.util.List;
+import java.util.Objects;
 
 import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 
@@ -93,5 +94,28 @@ public class UrlMapping {
         this.accounts = accounts;
     }
 
-    //TODO: equals, hashCode, toString
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UrlMapping that = (UrlMapping) o;
+        return Objects.equals(targetUrl, that.targetUrl) &&
+                redirectType == that.redirectType;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(targetUrl, redirectType);
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("UrlMapping{");
+        sb.append("id=").append(id);
+        sb.append(", shortUrl='").append(shortUrl).append('\'');
+        sb.append(", targetUrl='").append(targetUrl).append('\'');
+        sb.append(", redirectType=").append(redirectType);
+        sb.append('}');
+        return sb.toString();
+    }
 }

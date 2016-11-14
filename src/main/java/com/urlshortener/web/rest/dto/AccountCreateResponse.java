@@ -4,18 +4,18 @@ import java.util.Objects;
 
 import static com.urlshortener.util.Constants.ACCOUNT_CREATE_FAILURE_DESCRIPTION;
 
-public class AccountResponse {
+public class AccountCreateResponse {
     public static final String SUCCESS_DESCRIPTION = "Your account is opened";
-    private static final AccountResponse FAILURE = new AccountResponse(null, false, ACCOUNT_CREATE_FAILURE_DESCRIPTION);
+    private static final AccountCreateResponse FAILURE = new AccountCreateResponse(null, false, ACCOUNT_CREATE_FAILURE_DESCRIPTION);
 
     private boolean success;
     private String description;
     private String password;
 
-    public AccountResponse() {
+    public AccountCreateResponse() {
     }
 
-    public AccountResponse(String password, boolean success, String description) {
+    public AccountCreateResponse(String password, boolean success, String description) {
         this.success = success;
         this.description = description;
         this.password = password;
@@ -45,12 +45,12 @@ public class AccountResponse {
         this.password = password;
     }
 
-    public static AccountResponse success(String password) {
+    public static AccountCreateResponse success(String password) {
         Objects.requireNonNull(password);
-        return new AccountResponse(password, true, SUCCESS_DESCRIPTION);
+        return new AccountCreateResponse(password, true, SUCCESS_DESCRIPTION);
     }
 
-    public static AccountResponse failure() {
+    public static AccountCreateResponse failure() {
         return FAILURE;
     }
 }

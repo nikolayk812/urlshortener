@@ -3,7 +3,7 @@ package com.urlshortener.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "stats")
+@Table(name = "url_stats")
 public class UrlStatistics {
 
     @Id
@@ -14,7 +14,6 @@ public class UrlStatistics {
     @Column(name = "hit_counter")
     private int hitCounter;
 
-    //TODO: foreign key?
     @OneToOne
     @JoinColumn(name = "url_id", unique = true, nullable = false)
     private UrlMapping urlMapping;
@@ -50,4 +49,5 @@ public class UrlStatistics {
     public void setId(Integer id) {
         this.id = id;
     }
+
 }

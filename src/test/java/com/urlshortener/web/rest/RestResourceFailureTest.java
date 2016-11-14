@@ -2,7 +2,7 @@ package com.urlshortener.web.rest;
 
 import com.urlshortener.model.Account;
 import com.urlshortener.util.TestUtils;
-import com.urlshortener.web.rest.dto.AccountRequest;
+import com.urlshortener.web.rest.dto.AccountCreateRequest;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 
@@ -25,7 +25,7 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
 
         TestUtils.print(mockMvc.perform(post(RestResource.ACCOUNT_PATH)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(TestUtils.toJson(new AccountRequest(ACCOUNT_NAME)))))
+                .content(TestUtils.toJson(new AccountCreateRequest(ACCOUNT_NAME)))))
                 .andExpect(status().isConflict())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
                 .andExpect(jsonPath("$.success", is(false)))
@@ -33,8 +33,13 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
                 .andExpect(jsonPath("$.password").doesNotExist());
     }
 
-    //TODO: invalid name
-    //TODO: invalid JSON
+    @Test
+    public void testCreateAccountBadName() throws Exception {
+        TestUtils.print(mockMvc.perform(post(RestResource.ACCOUNT_PATH)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtils.toJson(new AccountCreateRequest("?%")))))
+                .andExpect(status().isBadRequest());
+    }
 
     @Test
     public void testRegisterUrlNoAuthenticationHeader() throws Exception {
@@ -69,8 +74,6 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
                 .andExpect(content().string(isEmptyString()));
     }
 
-    //TODO: same URL for other account okay
-
     @Test
     public void testGetStatisticsNoAuthenticationHeader() throws Exception {
         TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME)
@@ -78,6 +81,18 @@ public class RestResourceFailureTest extends AbstractRestResourceTest {
                 .content(TestUtils.toJson(URL_REGISTER_REQUEST))))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string(isEmptyString()));
+    }
+
+    @Test
+    public void testRedirectNoShortUrl() throws Exception {
+        TestUtils.print(mockMvc.perform(get("/abcdef"))
+                .andExpect(status().isNotFound()));
+    }
+
+    @Test
+    public void testRedirectBadShortUrl() throws Exception {
+        TestUtils.print(mockMvc.perform(get("/abcdefg"))
+                .andExpect(status().isNotFound()));
     }
 
 }

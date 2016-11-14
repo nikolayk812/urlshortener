@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.urlshortener.util.Constants.*;
 import static java.util.Collections.emptyList;
@@ -33,6 +33,7 @@ import static java.util.stream.Collectors.toMap;
 @Transactional(isolation = Isolation.READ_COMMITTED)
 public class AccountServiceImpl implements AccountService, UserDetailsService {
     private final static Logger log = LoggerFactory.getLogger(AccountServiceImpl.class);
+    private final static int MAX_GENERATION_ATTEMPTS = 10;
 
     private final AccountRepository accountRepo;
     private final UrlRepository urlRepo;
@@ -53,6 +54,7 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         });
 
         String password = RandomStringGenerator.generate(PASSWORD_LENGTH);
+        //it is possible to get same password for different accounts, but it is okay
         Account account = new Account(accountName, password);
         return accountRepo.save(account);
     }
@@ -78,8 +80,15 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                 shortUrl = urlMapping.getShortUrl();
             }
         } else {
-            shortUrl = RandomStringGenerator.generate(SHORT_URL_LENGTH);
-            //TODO: it might be duplicate!!!
+            //it is possible to get duplicate short URL generated
+            int attempts = 0;
+            do {
+                attempts++;
+                if (attempts >= MAX_GENERATION_ATTEMPTS)
+                    throw new UrlDuplicateException("Failed to generate unique short URL within " +
+                            MAX_GENERATION_ATTEMPTS + " attempts", targetUrl);
+                shortUrl = RandomStringGenerator.generate(SHORT_URL_LENGTH);
+            } while (urlRepo.findByShortUrl(shortUrl).isPresent());
             urlMapping = new UrlMapping(shortUrl, targetUrl, redirectType, singletonList(account));
         }
 
@@ -93,13 +102,13 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepo.findOneByName(accountName)
                 .orElseThrow(() -> new NotFoundException(accountName));
 
-        List<UrlMapping> list = urlRepo.findByAccounts(singletonList(account));
-        return list.stream().collect(
-                toMap(
-                        UrlMapping::getTargetUrl,
-                        um -> cache.getCount(um.getTargetUrl())
-                )
-        );
+        return urlRepo.findByAccounts(singletonList(account))
+                .stream()
+                .map(UrlMapping::getTargetUrl)
+                .distinct()
+                .collect(toMap(
+                        Function.identity(),
+                        cache::getCount));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)

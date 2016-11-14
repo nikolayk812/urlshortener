@@ -1,13 +1,12 @@
 package com.urlshortener.web.rest.dto;
 
-//TODO: rename?
-public class AccountRequest {
+public class AccountCreateRequest {
     private String accountId;
 
-    public AccountRequest() {
+    public AccountCreateRequest() {
     }
 
-    public AccountRequest(String accountId) {
+    public AccountCreateRequest(String accountId) {
         this.accountId = accountId;
     }
 

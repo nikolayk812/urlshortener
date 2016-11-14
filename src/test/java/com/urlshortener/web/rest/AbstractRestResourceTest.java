@@ -10,6 +10,7 @@ import com.urlshortener.web.WebConfig;
 import com.urlshortener.web.rest.dto.UrlRegisterRequest;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -21,12 +22,14 @@ import org.springframework.web.context.WebApplicationContext;
 import javax.annotation.PostConstruct;
 
 import static com.urlshortener.util.Constants.PASSWORD_LENGTH;
+import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
 @ContextConfiguration(classes = {AppConfig.class, LocalAppConfig.class, WebConfig.class, SecurityConfig.class})
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/h2/initDB.sql")
+//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractRestResourceTest {
     static final String ACCOUNT_NAME = "first";
     static final String ACCOUNT_NAME_2 = "second";
@@ -34,6 +37,8 @@ public abstract class AbstractRestResourceTest {
     static final UrlRegisterRequest URL_REGISTER_REQUEST = new UrlRegisterRequest(URL);
     static final TestUtils.StringLengthMatcher PASSWORD_LENGTH_MATCHER =
             new TestUtils.StringLengthMatcher(PASSWORD_LENGTH);
+    static final TestUtils.StringLengthMatcher SHORT_URL_LENGTH_MATCHER =
+            new TestUtils.StringLengthMatcher(SHORT_URL_LENGTH);
 
     protected MockMvc mockMvc;
 
