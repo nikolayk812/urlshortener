@@ -4,10 +4,10 @@ import com.urlshortener.model.RedirectType;
 
 import java.util.Optional;
 
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class UrlRegisterRequest {
     private String url;
 
-    //TODO: try JsonEnumDefaultValue
     private Optional<RedirectType> redirectType = Optional.empty();
 
     public UrlRegisterRequest() {

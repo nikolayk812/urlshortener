@@ -8,6 +8,7 @@ import com.urlshortener.repo.UrlMappingRepository;
 import com.urlshortener.service.exceptions.AccountDuplicateException;
 import com.urlshortener.service.exceptions.AccountNotFoundException;
 import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
+import com.urlshortener.util.Pair;
 import com.urlshortener.util.RandomStringGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,9 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 
 import static com.urlshortener.util.Constants.*;
 import static java.util.Collections.emptyList;
@@ -102,13 +103,14 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         Account account = accountRepo.findOneByName(accountName)
                 .orElseThrow(() -> new AccountNotFoundException("Can not get URL statistics", accountName));
 
-        return urlMappingRepo.findByAccounts(singletonList(account))
-                .stream()
-                .map(UrlMapping::getTargetUrl)
-                .distinct()
+        List<UrlMapping> urlMappings = urlMappingRepo.findByAccounts(singletonList(account));
+
+        return urlMappings.stream()
                 .collect(toMap(
-                        Function.identity(),
-                        cache::getCount));
+                        UrlMapping::getTargetUrl,
+                        um -> aggregateHitCounter(um.getTargetUrl()),
+                        (a, b) -> a + b
+                ));
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
@@ -121,4 +123,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
                         new UsernameNotFoundException("Account " + accountName + " does not exist"));
     }
 
+    private int aggregateHitCounter(String targetUrl) {
+        int sum = 0;
+        for (RedirectType redirectType : RedirectType.values()) {
+            sum += cache.getCounter(new Pair<>(targetUrl, redirectType));
+        }
+        return sum;
+    }
 }

@@ -144,7 +144,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
 
     @DirtiesContext
     @Test
-    public void testTwoAccountsTwoUrls() throws Exception {
+    public void testTwoAccountsTwoUrlsHitting() throws Exception {
         Account account = accountService.createAccount(ACCOUNT_NAME);
         Account account2 = accountService.createAccount(ACCOUNT_NAME_2);
 

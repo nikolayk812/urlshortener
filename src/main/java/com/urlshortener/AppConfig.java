@@ -1,5 +1,6 @@
 package com.urlshortener;
 
+import com.urlshortener.service.UrlHitCountingCache;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,11 @@ public abstract class AppConfig {
     @Value("${hikari.poolsize}")
     private int poolSize;
 
+    @Value("${cache.maxSize:10000}")
+    private int cacheMaxSize;
+    @Value(("${cache.expireDurationMs:60000}")) //10 minutes
+    private long cacheExpireDurationMs;
+
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
         return new PropertySourcesPlaceholderConfigurer();
@@ -78,6 +84,11 @@ public abstract class AppConfig {
         transactionManager.setEntityManagerFactory(emf);
         transactionManager.setJpaDialect(vendorAdapter().getJpaDialect());
         return transactionManager;
+    }
+
+    @Bean
+    public UrlHitCountingCache cache() {
+        return new UrlHitCountingCache(cacheMaxSize, cacheExpireDurationMs);
     }
 
     private Properties additionalProperties() {

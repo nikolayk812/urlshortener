@@ -30,9 +30,9 @@
 
     <logger name="jdbc.resultsettable" level="DEBUG"/>
 
-    <logger name="jdbc.resultset" level="ERROR"/>
+    <logger name="jdbc.resultset" level="DEBUG"/>
 
-    <logger name="jdbc.connection" level="INFO"/>
+    <logger name="jdbc.connection" level="ERROR"/>
 
     <logger name="log4jdbc.debug" level="ERROR"/>
 
