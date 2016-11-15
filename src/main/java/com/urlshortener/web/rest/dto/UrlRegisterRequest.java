@@ -17,6 +17,11 @@ public class UrlRegisterRequest {
         this.url = url;
     }
 
+    public UrlRegisterRequest(String url, RedirectType redirectType) {
+        this.url = url;
+        this.redirectType = Optional.of(redirectType);
+    }
+
     public String getUrl() {
         return url;
     }

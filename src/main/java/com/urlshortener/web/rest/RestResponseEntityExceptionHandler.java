@@ -4,7 +4,6 @@ import com.urlshortener.service.exceptions.AccountDuplicateException;
 import com.urlshortener.service.exceptions.ShortUrlNotFoundException;
 import com.urlshortener.service.exceptions.TargetUrlDuplicateException;
 import com.urlshortener.web.rest.dto.AccountCreateResponse;
-import com.urlshortener.web.rest.dto.ErrorInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.Ordered;
@@ -40,18 +39,16 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
-    public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) throws IOException {
+    public void conflict(HttpServletRequest req, DataIntegrityViolationException e) throws IOException {
         log.error("Exception at request " + req.getRequestURL(), e);
-        return new ErrorInfo(req.getRequestURL(), e);
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler(ValidationException.class)
     @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 2)
-    ErrorInfo validationError(HttpServletRequest req, ValidationException e) {
+    void validationError(HttpServletRequest req, ValidationException e) {
         log.error("Exception at request " + req.getRequestURL());
-        return new ErrorInfo(req.getRequestURL(), e);
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
@@ -83,9 +80,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(RuntimeException.class)
     @ResponseBody
     @Order(Ordered.LOWEST_PRECEDENCE - 1)
-    ErrorInfo badRequest(HttpServletRequest req, RuntimeException e) {
+    void badRequest(HttpServletRequest req, RuntimeException e) {
         log.error("Exception at request {}" + req.getRequestURL(), e);
-        return new ErrorInfo(req.getRequestURL(), e);
     }
 
 
@@ -93,9 +89,8 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     @ExceptionHandler(Exception.class)
     @ResponseBody
     @Order(Ordered.LOWEST_PRECEDENCE)
-    public ErrorInfo handleError(HttpServletRequest req, Exception e) {
+    public void handleError(HttpServletRequest req, Exception e) {
         log.error("Exception at request " + req.getRequestURL(), e);
-        return new ErrorInfo(req.getRequestURL(), e);
     }
 
 }

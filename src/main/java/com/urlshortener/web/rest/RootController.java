@@ -16,6 +16,9 @@ import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
 
 @Controller
 public class RootController {
+    public static final String HELP = "help";
+    public static final String INDEX = "index";
+
     private final UrlService urlService;
 
     @Autowired
@@ -25,11 +28,14 @@ public class RootController {
 
     @GetMapping(value = "/")
     public String index() {
-        return "index";
+        return INDEX;
     }
 
     @GetMapping(value = "/{shortUrl}")
     public ModelAndView redirect(@PathVariable("shortUrl") String shortUrl) {
+        if (shortUrl.equalsIgnoreCase(HELP))
+            return new ModelAndView(INDEX);
+
         if (shortUrl.length() != SHORT_URL_LENGTH)
             throw new ShortUrlNotFoundException("Short URL should be of length " + SHORT_URL_LENGTH, shortUrl);
 
