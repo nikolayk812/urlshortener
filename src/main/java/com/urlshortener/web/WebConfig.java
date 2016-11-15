@@ -11,7 +11,7 @@ import org.springframework.web.servlet.view.InternalResourceViewResolver;
 @EnableWebMvc
 @ComponentScan(basePackages = "com.urlshortener.web.rest")
 public class WebConfig extends WebMvcConfigurerAdapter {
-
+    
     @Bean
     public InternalResourceViewResolver resourceViewResolver() {
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
