@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import static com.urlshortener.util.Constants.*;
 import static java.util.Collections.emptyList;
@@ -106,10 +107,11 @@ public class AccountServiceImpl implements AccountService, UserDetailsService {
         List<UrlMapping> urlMappings = urlMappingRepo.findByAccounts(singletonList(account));
 
         return urlMappings.stream()
+                .map(UrlMapping::getTargetUrl)
+                .distinct()
                 .collect(toMap(
-                        UrlMapping::getTargetUrl,
-                        um -> aggregateHitCounter(um.getTargetUrl()),
-                        (a, b) -> a + b
+                        Function.identity(),
+                        this::aggregateHitCounter
                 ));
     }
 
