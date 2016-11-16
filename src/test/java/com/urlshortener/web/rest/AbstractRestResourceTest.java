@@ -29,7 +29,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 @WebAppConfiguration
 @RunWith(SpringJUnit4ClassRunner.class)
 @Sql(scripts = "classpath:db/h2/initDB.sql")
-//@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractRestResourceTest {
     static final String ACCOUNT_NAME = "first";
     static final String ACCOUNT_NAME_2 = "second";

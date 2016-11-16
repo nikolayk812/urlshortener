@@ -29,7 +29,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(ShortUrlNotFoundException.class)
-    @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public void notFound(HttpServletRequest req, ShortUrlNotFoundException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
@@ -37,7 +36,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseBody
+
     @Order(Ordered.HIGHEST_PRECEDENCE + 1)
     public void conflict(HttpServletRequest req, DataIntegrityViolationException e) throws IOException {
         log.error("Exception at request " + req.getRequestURL(), e);
@@ -45,7 +44,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422
     @ExceptionHandler(ValidationException.class)
-    @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 2)
     void validationError(HttpServletRequest req, ValidationException e) {
         log.error("Exception at request " + req.getRequestURL());
@@ -62,7 +60,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(TargetUrlDuplicateException.class)
-    @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 4)
     void duplicateAccount(HttpServletRequest req, TargetUrlDuplicateException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
@@ -70,7 +67,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED) //401
     @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseBody
     @Order(Ordered.HIGHEST_PRECEDENCE + 5)
     void duplicateAccount(HttpServletRequest req, UsernameNotFoundException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
@@ -78,7 +74,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)      //400
     @ExceptionHandler(RuntimeException.class)
-    @ResponseBody
     @Order(Ordered.LOWEST_PRECEDENCE - 1)
     void badRequest(HttpServletRequest req, RuntimeException e) {
         log.error("Exception at request {}" + req.getRequestURL(), e);
@@ -87,7 +82,6 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)   //500
     @ExceptionHandler(Exception.class)
-    @ResponseBody
     @Order(Ordered.LOWEST_PRECEDENCE)
     public void handleError(HttpServletRequest req, Exception e) {
         log.error("Exception at request " + req.getRequestURL(), e);
