@@ -17,7 +17,10 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Cache for target URLs
+ * Emulation write-back cache for target URLs hit counting
+ *
+ * On first request we load counter from the DB or create a new one with 0 value
+ * On removal from cache we flush value to the DB.
  */
 public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectType>> {
     private final static Logger log = LoggerFactory.getLogger(UrlHitCountingCache.class);
@@ -62,7 +65,7 @@ public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectT
             ).orElseGet(() -> new UrlStatistics(hitCounter, urlMapping));
             urlStatsRepo.save(urlStatistics);
         } else {
-            log.error("");
+            log.error("Url mapping for " + pair.getFirst() + " " + pair.getSecond() + " exists in cache, but not in DB");
         }
     }
 
