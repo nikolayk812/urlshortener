@@ -51,7 +51,7 @@ public abstract class HitCountingCache<T> {
     public void hit(T key) {
         requireNonNull(key);
         try {
-            //TODO: not atomic
+            //TODO: not atomic update, unfortunately Guava Cache missing compute method and asMap() returns a view
             AtomicInteger counter = cache.get(key);
             counter.incrementAndGet();
             cache.put(key, counter);
@@ -60,7 +60,7 @@ public abstract class HitCountingCache<T> {
         }
     }
 
-    protected abstract AtomicInteger loadImpl(T key) throws Exception;
+    protected abstract AtomicInteger loadImpl(T key);
 
     protected abstract void onRemovalImpl(RemovalNotification<T, AtomicInteger> removalNotification);
 

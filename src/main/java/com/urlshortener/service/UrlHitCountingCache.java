@@ -34,7 +34,7 @@ public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectT
 
     @Transactional(isolation = Isolation.READ_COMMITTED, readOnly = true)
     @Override
-    protected AtomicInteger loadImpl(Pair<String, RedirectType> key) throws Exception {
+    protected AtomicInteger loadImpl(Pair<String, RedirectType> key) {
         Optional<UrlMapping> urlMappingOptional = urlMappingRepo.findByTargetUrlAndRedirectType(key.getFirst(), key.getSecond());
         return urlMappingOptional.map(urlMapping -> {
             Optional<UrlStatistics> urlStatistics = urlStatsRepo.findByUrlMapping(urlMapping);

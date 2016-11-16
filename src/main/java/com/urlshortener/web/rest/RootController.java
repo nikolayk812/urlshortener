@@ -31,6 +31,11 @@ public class RootController {
         return INDEX;
     }
 
+    @GetMapping(value = "/help")
+    public String help() {
+        return INDEX;
+    }
+
     @GetMapping(value = SHORT_URL_REGEX)
     public ModelAndView redirect(@PathVariable(SHORT_URL) String shortUrl) {
         UrlMapping urlMapping = urlService.hitShortUrl(shortUrl);
