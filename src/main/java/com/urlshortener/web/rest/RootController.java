@@ -10,11 +10,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
+import static com.urlshortener.util.Constants.SHORT_URL_LENGTH;
+
 
 @Controller
 public class RootController {
-    public static final String HELP = "help";
-    public static final String INDEX = "index";
+    private static final String SHORT_URL = "shortUrl";
+    private static final String SHORT_URL_REGEX = "/{" + SHORT_URL + ":[a-zA-Z0-9]{" + SHORT_URL_LENGTH + "}}";
+    private static final String INDEX = "index";
 
     private final UrlService urlService;
 
@@ -28,8 +31,8 @@ public class RootController {
         return INDEX;
     }
 
-    @GetMapping(value = "/{shortUrl}")
-    public ModelAndView redirect(@PathVariable("shortUrl:[a-zA-Z0-9]{6}") String shortUrl) {
+    @GetMapping(value = SHORT_URL_REGEX)
+    public ModelAndView redirect(@PathVariable(SHORT_URL) String shortUrl) {
         UrlMapping urlMapping = urlService.hitShortUrl(shortUrl);
         RedirectView redirectView = new RedirectView(urlMapping.getTargetUrl());
         redirectView.setStatusCode(HttpStatus.valueOf(urlMapping.getRedirectType().getCode()));
