@@ -12,9 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import static com.urlshortener.web.rest.RestResource.ACCOUNT_PATH;
+import static com.urlshortener.web.rest.RestResource.REGISTER_URL_PATH;
+import static com.urlshortener.web.rest.RestResource.STATISTICS_PATH;
+
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
 
@@ -36,6 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
+                .antMatchers(ACCOUNT_PATH).permitAll()
+                .antMatchers(REGISTER_URL_PATH).fullyAuthenticated()
+                .antMatchers(STATISTICS_PATH).fullyAuthenticated()
                 .antMatchers("/**").permitAll()
                 .and().httpBasic()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

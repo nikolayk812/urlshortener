@@ -25,9 +25,9 @@ import java.util.Map;
 
 @RestController
 public class RestResource {
-    static final String ACCOUNT_PATH = "/account";
-    static final String REGISTER_URL_PATH = "/register";
-    static final String STATISTICS_PATH = "/statistics";
+    public static final String ACCOUNT_PATH = "/account";
+    public static final String REGISTER_URL_PATH = "/register";
+    public static final String STATISTICS_PATH = "/statistics";
 
     private final AccountService service;
 

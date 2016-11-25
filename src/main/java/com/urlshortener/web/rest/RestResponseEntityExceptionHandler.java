@@ -10,6 +10,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -66,9 +67,9 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
     }
 
     @ResponseStatus(value = HttpStatus.UNAUTHORIZED) //401
-    @ExceptionHandler(UsernameNotFoundException.class)
+    @ExceptionHandler({UsernameNotFoundException.class, AccessDeniedException.class})
     @Order(Ordered.HIGHEST_PRECEDENCE + 5)
-    void duplicateAccount(HttpServletRequest req, UsernameNotFoundException e) {
+    void notAllowed(HttpServletRequest req, RuntimeException e) {
         log.error("Exception at request " + req.getRequestURL(), e);
     }
 
