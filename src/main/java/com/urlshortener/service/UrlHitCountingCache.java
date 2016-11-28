@@ -40,7 +40,7 @@ public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectT
     protected AtomicInteger loadImpl(Pair<String, RedirectType> key) {
         Optional<UrlMapping> urlMappingOptional = urlMappingRepo.findByTargetUrlAndRedirectType(key.getFirst(), key.getSecond());
         return urlMappingOptional.map(urlMapping -> {
-            Optional<UrlStatistics> urlStatistics = urlStatsRepo.findByUrlMapping(urlMapping);
+            Optional<UrlStatistics> urlStatistics = urlStatsRepo.findById(urlMapping.getId());
             if (urlStatistics.isPresent()) {
                 return new AtomicInteger(urlStatistics.get().getHitCounter());
             } else {
@@ -56,7 +56,7 @@ public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectT
         Optional<UrlMapping> urlMappingOptional = urlMappingRepo.findByTargetUrlAndRedirectType(pair.getFirst(), pair.getSecond());
         if (urlMappingOptional.isPresent()) {
             UrlMapping urlMapping = urlMappingOptional.get();
-            Optional<UrlStatistics> urlStatisticsOptional = urlStatsRepo.findByUrlMapping(urlMapping);
+            Optional<UrlStatistics> urlStatisticsOptional = urlStatsRepo.findById(urlMapping.getId());
             int hitCounter = removalNotification.getValue().get();
             UrlStatistics urlStatistics = urlStatisticsOptional.map(us -> {
                         us.setHitCounter(hitCounter);

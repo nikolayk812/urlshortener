@@ -28,8 +28,7 @@ CREATE TABLE account_short_urls (
 );
 
 CREATE TABLE url_stats (
-  id INTEGER DEFAULT global_seq.nextval PRIMARY KEY,
-  url_id INTEGER NOT NULL,
+  url_id INTEGER PRIMARY KEY ,
   hit_counter INTEGER NOT NULL,
   FOREIGN KEY (url_id) REFERENCES short_urls (id)
 );
