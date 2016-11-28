@@ -38,8 +38,4 @@ public class UrlStatistics extends BaseEntity {
         return urlMapping;
     }
 
-    public void setUrlMapping(UrlMapping urlMapping) {
-        this.urlMapping = urlMapping;
-    }
-
 }

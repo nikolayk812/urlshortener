@@ -56,33 +56,18 @@ public class UrlMapping extends BaseEntity {
         return shortUrl;
     }
 
-    public void setShortUrl(String shortUrl) {
-        this.shortUrl = shortUrl;
-    }
-
     public String getTargetUrl() {
         return targetUrl;
-    }
-
-    public void setTargetUrl(String targetUrl) {
-        this.targetUrl = targetUrl;
     }
 
     public RedirectType getRedirectType() {
         return redirectType;
     }
 
-    public void setRedirectType(RedirectType redirectType) {
-        this.redirectType = redirectType;
-    }
-
     public List<Account> getAccounts() {
         return accounts;
     }
 
-    public void setAccounts(List<Account> accounts) {
-        this.accounts = accounts;
-    }
 
     @Override
     public boolean equals(Object o) {

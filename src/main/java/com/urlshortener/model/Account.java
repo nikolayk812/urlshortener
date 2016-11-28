@@ -3,8 +3,6 @@ package com.urlshortener.model;
 import com.urlshortener.util.Constants;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.Access;
-import javax.persistence.AccessType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -16,7 +14,6 @@ import static com.urlshortener.util.Constants.PASSWORD_LENGTH;
 
 @Entity
 @Table(name = "accounts")
-@Access(AccessType.FIELD)
 public class Account extends BaseEntity {
 
     @NotEmpty
@@ -41,16 +38,8 @@ public class Account extends BaseEntity {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getPassword() {
         return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
 

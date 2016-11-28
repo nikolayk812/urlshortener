@@ -1,6 +1,8 @@
 package com.urlshortener.model;
 
 
+import javax.persistence.Access;
+import javax.persistence.AccessType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -8,6 +10,7 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.SequenceGenerator;
 
 @MappedSuperclass
+@Access(AccessType.FIELD)
 public class BaseEntity {
 
     @Id
@@ -19,7 +22,4 @@ public class BaseEntity {
         return id;
     }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
 }
