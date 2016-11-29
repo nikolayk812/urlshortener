@@ -63,7 +63,7 @@ public class UrlHitCountingCache extends HitCountingCache<Pair<String, RedirectT
                         return us;
                     }
             ).orElseGet(() -> new UrlStatistics(hitCounter, urlMapping));
-            urlStatsRepo.save(urlStatistics);
+            urlStatsRepo.saveAndFlush(urlStatistics);
         } else {
             log.error("Url mapping for " + pair.getFirst() + " " + pair.getSecond() + " exists in cache, but not in DB");
         }

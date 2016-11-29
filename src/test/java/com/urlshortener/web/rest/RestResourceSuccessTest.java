@@ -144,7 +144,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
 
     @DirtiesContext
     @Test
-    public void testTwoAccountsTwoUrlsHitting() throws Exception {
+    public void testTwoAccountsMultipleUrlHitting() throws Exception {
         Account account = accountService.createAccount(ACCOUNT_NAME);
         Account account2 = accountService.createAccount(ACCOUNT_NAME_2);
 
@@ -154,8 +154,14 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
         String shortUrl4 = accountService.registerUrl(URL_2, FOUND, ACCOUNT_NAME_2);
 
         hitShortUrl(shortUrl, status().isMovedPermanently(), URL);
+        hitShortUrl(shortUrl, status().isMovedPermanently(), URL);
+
         hitShortUrl(shortUrl2, status().isFound(), URL);
+        hitShortUrl(shortUrl, status().isMovedPermanently(), URL);
+
         hitShortUrl(shortUrl3, status().isMovedPermanently(), URL_2);
+        hitShortUrl(shortUrl, status().isMovedPermanently(), URL);
+
         hitShortUrl(shortUrl4, status().isFound(), URL_2);
 
         TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME)
@@ -163,7 +169,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.['" + URL + "']", equalTo(2))))
+                .andExpect(jsonPath("$.['" + URL + "']", equalTo(5))))
                 .andExpect(jsonPath("$.['" + URL_2 + "']", equalTo(2)));
 
         TestUtils.print(mockMvc.perform(get(STATISTICS_PATH + "/" + ACCOUNT_NAME_2)
@@ -171,7 +177,7 @@ public class RestResourceSuccessTest extends AbstractRestResourceTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
-                .andExpect(jsonPath("$.['" + URL + "']", equalTo(2))))
+                .andExpect(jsonPath("$.['" + URL + "']", equalTo(5))))
                 .andExpect(jsonPath("$.['" + URL_2 + "']", equalTo(2)));
     }
 

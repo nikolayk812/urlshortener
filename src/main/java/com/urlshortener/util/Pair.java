@@ -24,8 +24,8 @@ public class Pair<S,T> {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Pair{");
-        sb.append("first=").append(first);
-        sb.append(", second=").append(second);
+        sb.append(first);
+        sb.append(" / ").append(second);
         sb.append('}');
         return sb.toString();
     }

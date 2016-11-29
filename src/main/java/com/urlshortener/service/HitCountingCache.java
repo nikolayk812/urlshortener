@@ -13,7 +13,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.util.Objects.requireNonNull;
 
-//javadoc
 public abstract class HitCountingCache<T> {
     private final static Logger log = LoggerFactory.getLogger(HitCountingCache.class);
     private final LoadingCache<T, AtomicInteger> cache;
@@ -40,8 +39,9 @@ public abstract class HitCountingCache<T> {
     public int getCounter(T key) {
         requireNonNull(key);
         try {
-            AtomicInteger counter = cache.get(key);
-            return counter.get();
+            int counter = cache.get(key).get();
+            log.debug("For key {} counter {}", key, counter);
+            return counter;
         } catch (ExecutionException e) {
             log.error("Failed to get counter for key " + key + ", returning 0 as default value", e);
             return 0;
@@ -51,10 +51,8 @@ public abstract class HitCountingCache<T> {
     public void hit(T key) {
         requireNonNull(key);
         try {
-            //TODO: not atomic update, unfortunately Guava Cache missing compute method and asMap() returns a view
-            AtomicInteger counter = cache.get(key);
-            counter.incrementAndGet();
-            cache.put(key, counter);
+            int counter = cache.get(key).incrementAndGet();
+            log.debug("Hit key {} counter: {}", key, counter);
         } catch (ExecutionException e) {
             log.error("Failed to increment counter for key " + key + ", skipping", e);
         }
