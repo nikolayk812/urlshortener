@@ -46,4 +46,8 @@ public class UrlStatistics {
         return urlMapping;
     }
 
+    public Integer getId() {
+        return id;
+    }
+
 }

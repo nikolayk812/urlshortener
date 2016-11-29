@@ -36,7 +36,7 @@ public class UrlMapping extends BaseEntity {
     @Column(name = "redirect_type", nullable = false)
     private RedirectType redirectType;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "account_short_urls",
             joinColumns = @JoinColumn(name = "short_url_id"),
             inverseJoinColumns = @JoinColumn(name = "account_id"))
